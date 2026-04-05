@@ -11,7 +11,7 @@ export const TestStore = create<TestStore>(() => ({
 
   testBackend: async () => {
     try {
-      const response = axiosInstance.get("/health");
+      const response = await axiosInstance.get("/health");
       console.log(response);
     } catch {
       console.log("error");
