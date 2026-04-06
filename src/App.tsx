@@ -9,6 +9,8 @@ import AuthRoutes from "./routes/AuthRoutes";
 import { AuthStore } from "./store/AuthStore";
 import ProtectedRoutes from "./routes/ProtectedRoutes";
 import Dashboard from "./pages/parent/Dashboard";
+import ParentRoutes from "./routes/ParentRoutes";
+import StudentRoutes from "./routes/StudentRoutes";
 
 function App() {
   const { checkAuth } = AuthStore();
@@ -27,7 +29,13 @@ function App() {
         </Route>
 
         <Route element={<ProtectedRoutes />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route element={<ParentRoutes />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Route>
+
+          <Route element={<StudentRoutes />}>
+            <Route path="/home" element={<Dashboard />} />
+          </Route>
         </Route>
       </Routes>
     </>

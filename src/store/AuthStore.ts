@@ -27,6 +27,7 @@ export const AuthStore = create<AuthStore>((set) => ({
       const response = await axiosInstance.post("/api/auth/login", formData);
       console.log(response);
       set({ authUser: response.data });
+      localStorage.setItem("user_role", response.data.role);
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
       const errorMessage =
@@ -45,6 +46,7 @@ export const AuthStore = create<AuthStore>((set) => ({
       const response = await axiosInstance.post("/api/auth/register", formData);
       console.log(response);
       set({ authUser: response.data });
+      localStorage.setItem("user_role", response.data.role);
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
       const errorMessage =
@@ -61,7 +63,7 @@ export const AuthStore = create<AuthStore>((set) => ({
       set({ isCheckingAuth: true });
       set({ authUser: response.data });
     } catch {
-      console.log("error");
+      console.log("Unauthorsed");
     } finally {
       set({ isCheckingAuth: false });
     }
