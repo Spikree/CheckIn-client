@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AuthStore } from "@/store/AuthStore";
 
 function StockGoogleIcon() {
   return (
@@ -32,13 +33,15 @@ function StockGoogleIcon() {
 }
 
 function SignupPage() {
+  const { signup } = AuthStore();
+
   const [fullName, setFullName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [role, setRole] = useState<string>("parent");
+  const [role, setRole] = useState<string>("PARENT");
 
   const formData = {
-    name: fullName,
+    username: fullName,
     email: email,
     password: password,
     role: role,
@@ -46,7 +49,7 @@ function SignupPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+    signup(formData);
   };
 
   return (
@@ -126,8 +129,8 @@ function SignupPage() {
                   <SelectValue placeholder="Select your role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="parent">Parent</SelectItem>
-                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="PARENT">Parent</SelectItem>
+                  <SelectItem value="STUDENT">Student</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -4,7 +4,12 @@ import { AxiosError } from "axios";
 
 interface AuthStore {
   login: (formData: { email: string; password: string }) => Promise<void>;
-  signup: () => Promise<void>;
+  signup: (formData: {
+    username: string;
+    email: string;
+    password: string;
+    role: string;
+  }) => Promise<void>;
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
 
@@ -16,6 +21,7 @@ interface AuthStore {
 export const AuthStore = create<AuthStore>((set) => ({
   isCheckingAuth: false,
   authUser: null,
+
   login: async (formData: { email: string; password: string }) => {
     try {
       const response = await axiosInstance.post("/api/auth/login", formData);
@@ -29,12 +35,22 @@ export const AuthStore = create<AuthStore>((set) => ({
     }
   },
 
-  signup: async () => {
+  signup: async (formData: {
+    username: string;
+    email: string;
+    password: string;
+    role: string;
+  }) => {
     try {
-      const response = await axiosInstance.get("/api/auth/register");
+      const response = await axiosInstance.post("/api/auth/register", formData);
       console.log(response);
-    } catch {
-      console.log("error");
+      set({ authUser: response.data });
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      const errorMessage =
+        axiosError.response?.data?.message ||
+        "Signup failed. Please try again.";
+      console.log(errorMessage);
     }
   },
 

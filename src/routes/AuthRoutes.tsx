@@ -10,7 +10,7 @@ const AuthRoutes = () => {
   const isAuthRoute =
     location.pathname === "/" ||
     location.pathname === "/login" ||
-    location.pathname === "signup";
+    location.pathname === "/signup";
 
   if (isCheckingAuth) {
     return null;
