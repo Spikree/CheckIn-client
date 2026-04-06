@@ -1,8 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { AuthLayout } from "@/pages/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function StockGoogleIcon() {
   return (
@@ -25,8 +32,21 @@ function StockGoogleIcon() {
 }
 
 function SignupPage() {
+  const [fullName, setFullName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [role, setRole] = useState<string>("parent");
+
+  const formData = {
+    name: fullName,
+    email: email,
+    password: password,
+    role: role,
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(formData);
   };
 
   return (
@@ -54,8 +74,13 @@ function SignupPage() {
                 autoCapitalize="words"
                 autoCorrect="off"
                 disabled={false}
+                value={fullName}
+                onChange={(e) => {
+                  setFullName(e.target.value);
+                }}
               />
             </div>
+
             <div className="grid gap-1">
               <Label className="sr-only" htmlFor="email">
                 Email
@@ -68,8 +93,13 @@ function SignupPage() {
                 autoComplete="email"
                 autoCorrect="off"
                 disabled={false}
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
               />
             </div>
+
             <div className="grid gap-1">
               <Label className="sr-only" htmlFor="password">
                 Password
@@ -79,9 +109,30 @@ function SignupPage() {
                 placeholder="Create a strong password"
                 type="password"
                 disabled={false}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
               />
             </div>
-            <Button className="mt-2">Sign Up as Parent</Button>
+
+            {/* Role Dropdown */}
+            <div className="grid gap-1">
+              <Label className="sr-only" htmlFor="role">
+                Role
+              </Label>
+              <Select value={role} onValueChange={setRole}>
+                <SelectTrigger id="role" className="w-full">
+                  <SelectValue placeholder="Select your role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="parent">Parent</SelectItem>
+                  <SelectItem value="student">Student</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button className="mt-2">Sign Up</Button>
           </div>
         </form>
 
@@ -98,9 +149,6 @@ function SignupPage() {
           <Button variant="outline" type="button" disabled={false}>
             <StockGoogleIcon />
             Continue with Google
-          </Button>
-          <Button variant="secondary" type="button" disabled={false}>
-            Sign Up as Student (Invite Only)
           </Button>
         </div>
       </div>

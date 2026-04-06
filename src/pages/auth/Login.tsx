@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { AuthLayout } from "@/pages/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AuthStore } from "@/store/AuthStore";
 
 function StockGoogleIcon() {
   return (
@@ -25,8 +26,17 @@ function StockGoogleIcon() {
 }
 
 function LoginPage() {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const formData = {
+    email,
+    password,
+  };
+  const { login } = AuthStore();
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    login(formData);
   };
 
   return (
@@ -53,6 +63,8 @@ function LoginPage() {
                 autoComplete="email"
                 autoCorrect="off"
                 disabled={false}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="grid gap-1">
@@ -66,6 +78,8 @@ function LoginPage() {
                 placeholder="Your password"
                 type="password"
                 disabled={false}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <Button className="mt-2">Sign In</Button>

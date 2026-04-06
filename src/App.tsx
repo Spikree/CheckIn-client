@@ -5,20 +5,30 @@ import { Routes, Route } from "react-router-dom";
 import LandingPage from "@/pages/LandingPage";
 import LoginPage from "@/pages/auth/Login";
 import SignupPage from "@/pages/auth/Signup";
+import AuthRoutes from "./routes/AuthRoutes";
+import { AuthStore } from "./store/AuthStore";
+import ProtectedRoutes from "./routes/ProtectedRoutes";
+import Dashboard from "./pages/parent/Dashboard";
 
 function App() {
-  // const { testBackend } = TestStore();
+  const { checkAuth } = AuthStore();
 
-  // useEffect(() => {
-  //   testBackend();
-  // }, [testBackend]);
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   return (
     <>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        <Route element={<AuthRoutes />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+        </Route>
+
+        <Route element={<ProtectedRoutes />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
       </Routes>
     </>
   );
