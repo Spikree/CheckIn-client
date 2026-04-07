@@ -8,14 +8,17 @@ interface StudentStore {
   acceptRequest: (requestId: string) => Promise<void>;
 
   getTasks: () => Promise<void>;
+  toggleTask: (taskId: string) => Promise<void>;
 
   requests: [];
   tasks: [];
+  completedTasks: [];
 }
 
 export const StudentStore = create<StudentStore>((set) => ({
   requests: [],
   tasks: [],
+  completedTasks: [],
 
   addParent: async (targetParentEmail: string) => {
     try {
@@ -57,6 +60,25 @@ export const StudentStore = create<StudentStore>((set) => ({
       const response = await axiosInstance.get("/api/tasks");
       console.log(response);
       set({ tasks: response.data });
+    } catch (e) {
+      console.log(e);
+    }
+  },
+
+  toggleTask: async (taskId: string) => {
+    try {
+      const response = await axiosInstance.post(`/api/tasks/${taskId}/toggle`);
+      console.log(response);
+    } catch (e) {
+      console.log(e);
+    }
+  },
+
+  getCompletedTasks: async () => {
+    try {
+      const response = await axiosInstance.get("/api/tasks/completed");
+      console.log(response);
+      set({ completedTasks: response.data });
     } catch (e) {
       console.log(e);
     }
