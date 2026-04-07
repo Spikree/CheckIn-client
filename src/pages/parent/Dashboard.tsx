@@ -18,27 +18,67 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { LogOut, Plus, User, ArrowRight } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { LogOut, Plus, User, ArrowRight, Clock, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface Student {
-  id: number;
+  id: string;
   username: string;
   email: string;
+}
+
+interface PendingRequest {
+  id: string;
+  status: string;
+  receiver: {
+    username: string;
+    email: string;
+  };
 }
 
 export default function Dashboard() {
   const { logout } = AuthStore();
   const [targetStudentEmail, setTargetStudentEmail] = useState<string>("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control the popup
-  const { getStudents, addStudent, studentList } = ParentStore();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const {
+    getStudents,
+    addStudent,
+    studentList,
+    pendingRequests,
+    getMyPendingRequests,
+    cancelPendingRequest,
+  } = ParentStore();
 
   const add = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!targetStudentEmail) return;
 
     await addStudent(targetStudentEmail);
-    setTargetStudentEmail(""); // Clear the input
-    setIsDialogOpen(false); // Close the pop-up immediately after submitting!
+    setTargetStudentEmail("");
+    setIsDialogOpen(false);
+  };
+
+  // Fetch pending requests when the sheet opens
+  const handleOpenRequests = async (open: boolean) => {
+    setIsSheetOpen(open);
+    if (open) {
+      await getMyPendingRequests();
+    }
+  };
+
+  const cancelRequest = (requestId: string) => {
+    cancelPendingRequest(requestId);
+    setIsSheetOpen(!open);
   };
 
   useEffect(() => {
@@ -53,12 +93,73 @@ export default function Dashboard() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3">
+          {/* PENDING REQUESTS SHEET */}
+          <Sheet open={isSheetOpen} onOpenChange={handleOpenRequests}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="relative">
+                <Clock className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Pending Requests</span>
+                <span className="sm:hidden">Pending</span>
+              </Button>
+            </SheetTrigger>
+
+            <SheetContent className="w-100 sm:w-[540px] overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Sent Requests</SheetTitle>
+                <SheetDescription>
+                  Invitations you have sent to students that are awaiting
+                  approval.
+                </SheetDescription>
+              </SheetHeader>
+
+              <div className="mt-8 space-y-4">
+                {!pendingRequests || pendingRequests.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground text-sm">
+                    No pending requests at the moment.
+                  </div>
+                ) : (
+                  pendingRequests.map((req: PendingRequest) => (
+                    <div
+                      key={req.id}
+                      className="flex flex-col space-y-4 rounded-lg border p-4 shadow-sm bg-muted/30"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex flex-col space-y-1">
+                          <span className="font-medium text-foreground capitalize">
+                            {req.receiver.username}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {req.receiver.email}
+                          </span>
+                        </div>
+
+                        {/* Added a placeholder cancel button here.
+                          You can wire this up later if you want parents to be able to revoke requests!
+                        */}
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 text-muted-foreground hover:text-red-600 hover:bg-red-50"
+                          title="Cancel Request"
+                          onClick={() => cancelRequest(req.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+
           {/* THE POP-UP TRIGGER & CONTENT */}
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                Link Student
+                <span className="hidden sm:inline">Link Student</span>
+                <span className="sm:hidden">Link</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
@@ -92,7 +193,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Main Content Area (Now full width!) */}
+      {/* Main Content Area */}
       <Card>
         <CardHeader>
           <CardTitle>My Students</CardTitle>
@@ -130,14 +231,15 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Updated Button Text */}
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full sm:w-auto"
-                  >
-                    Student Dashboard <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  <Link to={`/studentRoutes/${student.id}`}>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full sm:w-auto"
+                    >
+                      Student Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
                 </div>
               ))
             )}

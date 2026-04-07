@@ -12,6 +12,7 @@ import Dashboard from "@/pages/parent/Dashboard";
 import ParentRoutes from "@/routes/ParentRoutes";
 import StudentRoutes from "@/routes/StudentRoutes";
 import Home from "@/pages/student/Home";
+import StudentDashboard from "@/pages/parent/StudentDashboard";
 
 function App() {
   const { checkAuth } = AuthStore();
@@ -32,6 +33,10 @@ function App() {
         <Route element={<ProtectedRoutes />}>
           <Route element={<ParentRoutes />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route
+              path="/studentRoutes/:studentId"
+              element={<StudentDashboard />}
+            />
           </Route>
 
           <Route element={<StudentRoutes />}>
