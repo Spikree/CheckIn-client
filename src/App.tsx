@@ -5,12 +5,13 @@ import { Routes, Route } from "react-router-dom";
 import LandingPage from "@/pages/LandingPage";
 import LoginPage from "@/pages/auth/Login";
 import SignupPage from "@/pages/auth/Signup";
-import AuthRoutes from "./routes/AuthRoutes";
-import { AuthStore } from "./store/AuthStore";
-import ProtectedRoutes from "./routes/ProtectedRoutes";
-import Dashboard from "./pages/parent/Dashboard";
-import ParentRoutes from "./routes/ParentRoutes";
-import StudentRoutes from "./routes/StudentRoutes";
+import AuthRoutes from "@/routes/AuthRoutes";
+import { AuthStore } from "@/store/AuthStore";
+import ProtectedRoutes from "@/routes/ProtectedRoutes";
+import Dashboard from "@/pages/parent/Dashboard";
+import ParentRoutes from "@/routes/ParentRoutes";
+import StudentRoutes from "@/routes/StudentRoutes";
+import Home from "@/pages/student/Home";
 
 function App() {
   const { checkAuth } = AuthStore();
@@ -34,7 +35,7 @@ function App() {
           </Route>
 
           <Route element={<StudentRoutes />}>
-            <Route path="/home" element={<Dashboard />} />
+            <Route path="/home" element={<Home />} />
           </Route>
         </Route>
       </Routes>

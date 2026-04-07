@@ -5,13 +5,18 @@ import { AxiosError } from "axios";
 interface ParentStore {
   getStudents: () => Promise<void>;
   addStudent: (targetStudentEmail: string) => Promise<void>;
+
+  studentList: [];
 }
 
 export const ParentStore = create<ParentStore>((set) => ({
+  studentList: [],
+
   getStudents: async () => {
     try {
       const response = await axiosInstance.get("/api/family/children");
       console.log(response);
+      set({ studentList: response.data });
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
       const errorMessage =
