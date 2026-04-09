@@ -1,9 +1,7 @@
 import { CommonStore } from "@/store/CommonStore";
 import { useEffect, useMemo, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { useParams } from "react-router-dom";
+
 import {
   Card,
   CardContent,
@@ -12,12 +10,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ActivityCalendar } from "react-activity-calendar";
-import { ArrowLeft, ClipboardList, Flame } from "lucide-react";
+import { Flame } from "lucide-react";
+import Breadcrumb from "./PageBreadcrumbs";
 
 export default function TaskDashboard() {
   const { taskId } = useParams<{ taskId: string }>();
   const { getTaskHistory, taskHistory } = CommonStore();
-  const navigate = useNavigate();
 
   // 1. Create a reference to the scrollable container
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -71,37 +69,10 @@ export default function TaskDashboard() {
   }, [activityData]);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => navigate(-1)}
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <Separator orientation="vertical" className="h-5" />
-            <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-md bg-primary flex items-center justify-center">
-                <ClipboardList className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <span className="font-semibold text-base tracking-tight">
-                Task Activity
-              </span>
-            </div>
-          </div>
-          <Badge variant="secondary" className="font-mono text-xs">
-            ID: {taskId}
-          </Badge>
-        </div>
-      </header>
-
+    <div className="min-h-screen px-4 py-4 sm:px-6 sm:py-6 md:px-6 md:py-6 bg-background">
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-6 py-10">
+      <Breadcrumb currentPage="Task dashboard" />
+      <main className="max-w-7xl mx-auto px-6 py-4">
         {/* Stats Row */}
         <div className="flex items-center justify-between mb-6">
           <div>

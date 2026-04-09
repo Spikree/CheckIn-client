@@ -1,7 +1,7 @@
 import { StudentStore } from "@/store/StudentStore";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -37,6 +37,12 @@ export default function Home() {
     getCompletedTasks();
   }, [getTasks, getCompletedTasks]);
 
+  const navigate = useNavigate();
+
+  const taskDashboardNavigate = (taskId: string) => {
+    navigate(`/taskDashboard/${taskId}`);
+  };
+
   const handleToggleTask = async (taskId: string) => {
     await toggleTask(taskId);
     await getTasks();
@@ -55,7 +61,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-6 py-10">
+      <main className="max-w-7xl mx-auto px-6 py-10">
         {/* Page Header + Progress */}
         <div className="mb-10">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
@@ -175,11 +181,9 @@ export default function Home() {
                         </Button>
                       )}
 
-                      <Link to={`/taskDashboard/${task?.id}`}>
-                        <Button>
-                          Task Dashboard <ArrowUpCircle />
-                        </Button>
-                      </Link>
+                      <Button onClick={() => taskDashboardNavigate(task?.id)}>
+                        Task Dashboard <ArrowUpCircle />
+                      </Button>
                     </div>
                   </CardFooter>
                 </Card>

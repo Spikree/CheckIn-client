@@ -3,6 +3,7 @@ import { ParentStore } from "@/store/ParentStore";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
 import {
   Card,
   CardContent,
@@ -86,7 +87,7 @@ export default function Dashboard() {
   }, [getStudents]);
 
   return (
-    <div className="min-h-screen bg-background p-6 md:p-12 max-w-6xl mx-auto">
+    <div className="min-h-screen bg-background p-6 md:p-12 max-w-full mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 border-b pb-4 gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Parent Dashboard</h1>

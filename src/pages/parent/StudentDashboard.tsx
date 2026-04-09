@@ -1,6 +1,6 @@
 import { ParentStore } from "@/store/ParentStore";
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,16 +21,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+
 import {
-  ArrowLeft,
   Plus,
   ListTodo,
   CheckCircle2,
-  ClipboardList,
   Clock,
   ArrowRightCircle,
 } from "lucide-react";
+
+import PageBreadcrumbs from "../common/PageBreadcrumbs";
 
 interface Task {
   id: number | string;
@@ -56,7 +56,6 @@ export default function StudentDashboard() {
   } = ParentStore();
 
   const { studentId } = useParams<{ studentId: string }>();
-  const navigate = useNavigate();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -97,101 +96,81 @@ export default function StudentDashboard() {
     totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Sticky Nav */}
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 shrink-0"
-              onClick={() => navigate("/dashboard")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <Separator orientation="vertical" className="h-5" />
-            <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-md bg-primary flex items-center justify-center">
-                <ClipboardList className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <span className="font-semibold text-base tracking-tight">
-                Task Manager
-              </span>
-            </div>
-          </div>
-
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-1.5">
-                <Plus className="h-4 w-4" />
-                Assign Task
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Assign a Task</DialogTitle>
-                <DialogDescription>
-                  Create a new chore or assignment for this student.
-                </DialogDescription>
-              </DialogHeader>
-
-              <form
-                onSubmit={handleCreateTask}
-                className="flex flex-col gap-4 mt-2"
-              >
-                <div className="space-y-1.5">
-                  <label htmlFor="title" className="text-sm font-medium">
-                    Task Title
-                  </label>
-                  <Input
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g., Clean your room"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="description" className="text-sm font-medium">
-                    Description
-                    <span className="text-muted-foreground font-normal ml-1">
-                      (optional)
-                    </span>
-                  </label>
-                  <Textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Add any specific instructions here..."
-                    className="resize-none"
-                    rows={3}
-                  />
-                </div>
-
-                <Button type="submit" className="w-full mt-1">
-                  Assign Task
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </header>
-
+    <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-6 md:px-6 md:py-6 bg-background">
+      <PageBreadcrumbs currentPage="student dashboard" />
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-6 py-10">
+
+      <main className="max-w-7xl  mx-auto px-6 ">
         {/* Page Header + Progress */}
         <div className="mb-10">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
-            <div>
+            <div className="flex justify-between gap-8">
               <h1 className="text-2xl font-bold tracking-tight">
                 Student Tasks
               </h1>
-              <p className="text-sm text-muted-foreground mt-1">
+              {/*<p className="text-sm text-muted-foreground mt-1">
                 Student ID:{" "}
                 <span className="font-mono text-foreground">{studentId}</span>
-              </p>
+              </p>*/}
+
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-1.5">
+                    <Plus className="h-4 w-4" />
+                    Assign Task
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Assign a Task</DialogTitle>
+                    <DialogDescription>
+                      Create a new chore or assignment for this student.
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <form
+                    onSubmit={handleCreateTask}
+                    className="flex flex-col gap-4 mt-2"
+                  >
+                    <div className="space-y-1.5">
+                      <label htmlFor="title" className="text-sm font-medium">
+                        Task Title
+                      </label>
+                      <Input
+                        id="title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="e.g., Clean your room"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label
+                        htmlFor="description"
+                        className="text-sm font-medium"
+                      >
+                        Description
+                        <span className="text-muted-foreground font-normal ml-1">
+                          (optional)
+                        </span>
+                      </label>
+                      <Textarea
+                        id="description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Add any specific instructions here..."
+                        className="resize-none"
+                        rows={3}
+                      />
+                    </div>
+
+                    <Button type="submit" className="w-full mt-1">
+                      Assign Task
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
 
             {totalCount > 0 && (
