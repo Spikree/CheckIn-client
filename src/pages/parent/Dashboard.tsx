@@ -231,7 +231,7 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <Link to={`/studentRoutes/${student.id}`}>
+                  <Link to={`/studentDashboard/${student.id}`}>
                     <Button
                       variant="secondary"
                       size="sm"

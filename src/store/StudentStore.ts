@@ -9,6 +9,7 @@ interface StudentStore {
 
   getTasks: () => Promise<void>;
   toggleTask: (taskId: string) => Promise<void>;
+  getCompletedTasks: () => Promise<void>;
 
   requests: [];
   tasks: [];

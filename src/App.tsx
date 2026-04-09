@@ -13,6 +13,8 @@ import ParentRoutes from "@/routes/ParentRoutes";
 import StudentRoutes from "@/routes/StudentRoutes";
 import Home from "@/pages/student/Home";
 import StudentDashboard from "@/pages/parent/StudentDashboard";
+import TaskDashboard from "@/pages/common/TaskDashboard";
+import MainLayout from "./componentWrapers/MainLayout";
 
 function App() {
   const { checkAuth } = AuthStore();
@@ -31,16 +33,21 @@ function App() {
         </Route>
 
         <Route element={<ProtectedRoutes />}>
-          <Route element={<ParentRoutes />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route
-              path="/studentRoutes/:studentId"
-              element={<StudentDashboard />}
-            />
-          </Route>
+          {/*common routes*/}
+          <Route element={<MainLayout />}>
+            <Route path="/taskDashboard/:taskId" element={<TaskDashboard />} />
 
-          <Route element={<StudentRoutes />}>
-            <Route path="/home" element={<Home />} />
+            <Route element={<ParentRoutes />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route
+                path="/studentDashboard/:studentId"
+                element={<StudentDashboard />}
+              />
+            </Route>
+
+            <Route element={<StudentRoutes />}>
+              <Route path="/home" element={<Home />} />
+            </Route>
           </Route>
         </Route>
       </Routes>

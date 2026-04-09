@@ -8,6 +8,7 @@ interface ParentStore {
   getMyPendingRequests: () => Promise<void>;
   cancelPendingRequest: (requestId: string) => Promise<void>;
   getStudentTasks: (studentId: string) => Promise<void>;
+  getTasksCompletedByStudent: (studentId: string) => Promise<void>;
 
   createTaskForStudent: (
     studentId: string,
@@ -18,12 +19,14 @@ interface ParentStore {
   studentList: [];
   pendingRequests: [];
   studentTasks: [];
+  completedTasksByStudent: [];
 }
 
 export const ParentStore = create<ParentStore>((set) => ({
   studentList: [],
   pendingRequests: [],
   studentTasks: [],
+  completedTasksByStudent: [],
 
   getStudents: async () => {
     try {
@@ -96,6 +99,18 @@ export const ParentStore = create<ParentStore>((set) => ({
       const response = await axiosInstance(`/api/users/${studentId}/tasks`);
       console.log(response);
       set({ studentTasks: response.data });
+    } catch (e) {
+      console.log(e);
+    }
+  },
+
+  getTasksCompletedByStudent: async (studentId: string) => {
+    try {
+      const response = await axiosInstance.get(
+        `/api/users/${studentId}/tasks/completed`,
+      );
+      console.log(response);
+      set({ completedTasksByStudent: response.data });
     } catch (e) {
       console.log(e);
     }
