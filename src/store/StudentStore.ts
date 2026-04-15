@@ -6,6 +6,7 @@ interface StudentStore {
   addParent: (targetParentEmail: string) => Promise<void>;
   getRequests: () => Promise<void>;
   acceptRequest: (requestId: string) => Promise<void>;
+  getMyPendingRequests: () => Promise<void>;
 
   getTasks: () => Promise<void>;
   toggleTask: (taskId: string) => Promise<void>;
@@ -14,12 +15,14 @@ interface StudentStore {
   requests: [];
   tasks: [];
   completedTasks: [];
+  pendingRequests: [];
 }
 
 export const StudentStore = create<StudentStore>((set) => ({
   requests: [],
   tasks: [],
   completedTasks: [],
+  pendingRequests: [],
 
   addParent: async (targetParentEmail: string) => {
     try {
@@ -45,7 +48,7 @@ export const StudentStore = create<StudentStore>((set) => ({
     }
   },
 
-  acceptRequest: async (requestId) => {
+  acceptRequest: async (requestId: string) => {
     try {
       const response = await axiosInstance.post(
         `/api/family/requests/${requestId}/accept`,
@@ -80,6 +83,16 @@ export const StudentStore = create<StudentStore>((set) => ({
       const response = await axiosInstance.get("/api/tasks/completed");
       console.log(response);
       set({ completedTasks: response.data });
+    } catch (e) {
+      console.log(e);
+    }
+  },
+
+  getMyPendingRequests: async () => {
+    try {
+      const response = await axiosInstance.get("/api/family/requests/sent");
+      console.log(response);
+      set({ pendingRequests: response.data });
     } catch (e) {
       console.log(e);
     }

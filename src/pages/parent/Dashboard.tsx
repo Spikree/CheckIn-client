@@ -1,4 +1,3 @@
-import { AuthStore } from "@/store/AuthStore";
 import { ParentStore } from "@/store/ParentStore";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -27,7 +26,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { LogOut, Plus, User, ArrowRight, Clock, Trash2 } from "lucide-react";
+import { Plus, User, ArrowRight, Clock, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface Student {
@@ -46,7 +45,6 @@ interface PendingRequest {
 }
 
 export default function Dashboard() {
-  const { logout } = AuthStore();
   const [targetStudentEmail, setTargetStudentEmail] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -185,12 +183,6 @@ export default function Dashboard() {
               </form>
             </DialogContent>
           </Dialog>
-
-          {/* Logout Button */}
-          <Button variant="outline" onClick={logout}>
-            <LogOut className="h-4 w-4 sm:mr-2" />
-            <span className="hidden sm:inline">Logout</span>
-          </Button>
         </div>
       </div>
 

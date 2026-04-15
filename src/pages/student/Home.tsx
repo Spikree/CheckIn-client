@@ -1,5 +1,5 @@
 import { StudentStore } from "@/store/StudentStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,6 +11,15 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 import {
   Check,
@@ -19,6 +28,9 @@ import {
   CheckCircle2,
   RotateCcw,
   ArrowUpCircle,
+  UserPlus,
+  Clock,
+  User, // <-- Added for the Assigned By icon
 } from "lucide-react";
 
 interface Task {
@@ -26,21 +38,52 @@ interface Task {
   title: string;
   description: string;
   active: boolean;
+  assignedBy: string;
 }
 
 export default function Home() {
-  const { getTasks, tasks, toggleTask, getCompletedTasks, completedTasks } =
-    StudentStore();
+  const {
+    getTasks,
+    tasks,
+    toggleTask,
+    getCompletedTasks,
+    completedTasks,
+    addParent,
+    getMyPendingRequests,
+    pendingRequests,
+  } = StudentStore();
+
+  // State for Dialogs
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isPendingDialogOpen, setIsPendingDialogOpen] = useState(false);
+  const [parentIdInput, setParentIdInput] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getTasks();
     getCompletedTasks();
   }, [getTasks, getCompletedTasks]);
 
-  const navigate = useNavigate();
-
   const taskDashboardNavigate = (taskId: string) => {
     navigate(`/taskDashboard/${taskId}`);
+  };
+
+  const handleAddParent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!parentIdInput) return;
+
+    await addParent(parentIdInput);
+    setParentIdInput("");
+    setIsDialogOpen(false);
+  };
+
+  // Fetch pending requests when the dialog is opened
+  const handleOpenPending = async (open: boolean) => {
+    setIsPendingDialogOpen(open);
+    if (open) {
+      await getMyPendingRequests();
+    }
   };
 
   const handleToggleTask = async (taskId: string) => {
@@ -72,26 +115,107 @@ export default function Home() {
               </p>
             </div>
 
-            {totalCount > 0 && (
-              <div className="flex items-center gap-3 shrink-0">
-                <span className="text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">
-                    {completedCount}
-                  </span>{" "}
-                  of{" "}
-                  <span className="font-semibold text-foreground">
-                    {totalCount}
-                  </span>{" "}
-                  complete
-                </span>
-                <Badge
-                  variant={progressPercent === 100 ? "default" : "secondary"}
-                  className="text-xs"
-                >
-                  {progressPercent}%
-                </Badge>
-              </div>
-            )}
+            {/* Action Area: Add Parent Button + Pending Requests + Progress Stats */}
+            <div className="flex items-center gap-4 shrink-0">
+              {/* --- PENDING REQUESTS DIALOG --- */}
+              <Dialog
+                open={isPendingDialogOpen}
+                onOpenChange={handleOpenPending}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Clock className="h-4 w-4" />
+                    Sent Requests
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Sent Link Requests</DialogTitle>
+                    <DialogDescription>
+                      Requests you have sent to parents that are awaiting
+                      approval.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="mt-4 space-y-4 max-h-[60vh] overflow-y-auto">
+                    {!pendingRequests || pendingRequests.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground text-sm">
+                        No pending requests sent.
+                      </div>
+                    ) : (
+                      pendingRequests.map((req: any) => (
+                        <div
+                          key={req.id}
+                          className="flex flex-col space-y-1 rounded-lg border p-3 bg-muted/30"
+                        >
+                          <span className="font-medium text-foreground capitalize">
+                            {req.receiver.username}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {req.receiver.email}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* --- ADD PARENT DIALOG --- */}
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <UserPlus className="h-4 w-4" />
+                    Link Parent
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Link to a Parent</DialogTitle>
+                    <DialogDescription>
+                      Enter your parent's ID or email to connect your accounts
+                      and receive tasks.
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <form
+                    onSubmit={handleAddParent}
+                    className="flex flex-col gap-4 mt-4"
+                  >
+                    <Input
+                      value={parentIdInput}
+                      onChange={(e) => setParentIdInput(e.target.value)}
+                      placeholder="Parent ID or Email"
+                      required
+                    />
+                    <Button type="submit" className="w-full">
+                      Send Link Request
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+
+              {/* Existing Progress Indicator */}
+              {totalCount > 0 && (
+                <div className="flex items-center gap-3 border-l pl-4">
+                  <span className="text-sm text-muted-foreground">
+                    <span className="font-semibold text-foreground">
+                      {completedCount}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-semibold text-foreground">
+                      {totalCount}
+                    </span>{" "}
+                    complete
+                  </span>
+                  <Badge
+                    variant={progressPercent === 100 ? "default" : "secondary"}
+                    className="text-xs"
+                  >
+                    {progressPercent}%
+                  </Badge>
+                </div>
+              )}
+            </div>
           </div>
 
           {totalCount > 0 && (
@@ -133,7 +257,7 @@ export default function Home() {
                       : "shadow-sm hover:shadow-md hover:-translate-y-0.5"
                   }`}
                 >
-                  <CardHeader className="pb-2 pt-5">
+                  <CardHeader className="pb-3 pt-5">
                     <div className="flex items-start justify-between gap-3">
                       <CardTitle
                         className={`text-[15px] font-semibold leading-snug transition-colors ${
@@ -152,14 +276,29 @@ export default function Home() {
                     </div>
                   </CardHeader>
 
-                  <CardContent className="flex-1 pb-4">
+                  <CardContent className="flex-1 flex flex-col gap-4 pb-5">
                     <CardDescription className="text-sm leading-relaxed line-clamp-3">
                       {task.description || "No description provided."}
                     </CardDescription>
+
+                    {/* UPGRADED ASSIGNED BY SECTION */}
+                    <div className="flex items-center gap-2 mt-auto">
+                      <div
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border ${isCompleted ? "bg-transparent border-transparent text-muted-foreground" : "bg-muted/50 text-foreground/80"}`}
+                      >
+                        <User className="h-3.5 w-3.5" />
+                        <span>
+                          Assigned by{" "}
+                          <span className="capitalize">
+                            {task.assignedBy || "Unknown"}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
                   </CardContent>
 
-                  <CardFooter className="pt-0 pb-4">
-                    <div className="flex flex-col w-full gap-2">
+                  <CardFooter className="pt-0 pb-5">
+                    <div className="flex flex-col w-full gap-2.5">
                       {isCompleted ? (
                         <Button
                           onClick={() => handleToggleTask(task.id)}
@@ -167,7 +306,7 @@ export default function Home() {
                           size="sm"
                           className="w-full gap-1.5 text-muted-foreground hover:text-foreground"
                         >
-                          <RotateCcw className="h-3.5 w-3.5" />
+                          <RotateCcw className="h-4 w-4" />
                           Mark as Unfinished
                         </Button>
                       ) : (
@@ -176,13 +315,18 @@ export default function Home() {
                           size="sm"
                           className="w-full gap-1.5"
                         >
-                          <Check className="h-3.5 w-3.5" />
+                          <Check className="h-4 w-4" />
                           Mark as Finished
                         </Button>
                       )}
 
-                      <Button onClick={() => taskDashboardNavigate(task?.id)}>
-                        Task Dashboard <ArrowUpCircle />
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => taskDashboardNavigate(task?.id)}
+                        className="w-full gap-1.5"
+                      >
+                        <ArrowUpCircle className="h-4 w-4" /> Task Dashboard
                       </Button>
                     </div>
                   </CardFooter>

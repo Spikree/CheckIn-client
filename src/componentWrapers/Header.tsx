@@ -28,16 +28,18 @@ import {
   ClipboardList,
   UserCheck,
 } from "lucide-react";
+import { ParentStore } from "@/store/ParentStore";
 
 export default function Header() {
-  // Pulling what we need from both stores
   const { logout, authUser } = AuthStore();
   const { requests, getRequests, acceptRequest } = StudentStore();
+  const { IncomingRequests, getIncomingRequests, acceptIncomingRequest } =
+    ParentStore();
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Handle Sheet (Notifications)
+  // --- STUDENT HANDLERS ---
   const handleOpenRequests = async (open: boolean) => {
     setIsSheetOpen(open);
     if (open) await getRequests();
@@ -48,6 +50,18 @@ export default function Header() {
     await getRequests();
   };
 
+  // --- PARENT HANDLERS ---
+  const handleOpenParentRequests = async (open: boolean) => {
+    setIsSheetOpen(open);
+    if (open) await getIncomingRequests();
+  };
+
+  const handleAcceptParentRequest = async (requestId: string) => {
+    await acceptIncomingRequest(requestId);
+    await getIncomingRequests();
+  };
+
+  // --- COMMON HANDLERS ---
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -71,8 +85,7 @@ export default function Header() {
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-1 sm:gap-2">
-          {/* NOTIFICATION BELL (Only visible if the user is a Student) */}
-          {authUser?.role === "STUDENT" && (
+          {authUser?.role === "STUDENT" ? (
             <Sheet open={isSheetOpen} onOpenChange={handleOpenRequests}>
               <SheetTrigger asChild>
                 <Button
@@ -92,7 +105,6 @@ export default function Header() {
                 </Button>
               </SheetTrigger>
 
-              {/* ... The exact same Sheet Content from your old Home.tsx ... */}
               <SheetContent className="w-[380px] sm:w-[460px] flex flex-col gap-0 p-0">
                 <SheetHeader className="px-6 py-5 border-b">
                   <SheetTitle className="flex items-center gap-2">
@@ -120,9 +132,6 @@ export default function Header() {
                           <span className="text-sm font-medium capitalize">
                             {req.requester.username}
                           </span>
-                          {/*<span className="text-xs text-muted-foreground">
-                            {req.requester.email}
-                          </span>*/}
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Button
@@ -130,6 +139,77 @@ export default function Header() {
                             variant="ghost"
                             className="h-8 w-8 text-green-600 hover:bg-green-50"
                             onClick={() => handleAccept(req.id)}
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-red-500 hover:bg-red-50"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
+          ) : (
+            <Sheet open={isSheetOpen} onOpenChange={handleOpenParentRequests}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative text-muted-foreground hover:text-foreground"
+                >
+                  <Bell className="h-5 w-5" />
+                  {IncomingRequests && IncomingRequests.length > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute top-1 right-1 h-4 w-4 p-0 text-[10px] flex items-center justify-center rounded-full"
+                    >
+                      {IncomingRequests.length}
+                    </Badge>
+                  )}
+                </Button>
+              </SheetTrigger>
+
+              <SheetContent className="w-[380px] sm:w-[460px] flex flex-col gap-0 p-0">
+                <SheetHeader className="px-6 py-5 border-b">
+                  <SheetTitle className="flex items-center gap-2">
+                    <UserCheck className="h-5 w-5 text-muted-foreground" />
+                    Student Requests
+                  </SheetTitle>
+                  <SheetDescription>
+                    Students requesting to link with your account.
+                  </SheetDescription>
+                </SheetHeader>
+
+                <div className="flex-1 overflow-y-auto px-6 py-5 space-y-3">
+                  {!IncomingRequests || IncomingRequests.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center gap-2">
+                      <Bell className="h-8 w-8 text-muted-foreground/30 mb-2" />
+                      <p className="text-sm font-medium">No new requests</p>
+                    </div>
+                  ) : (
+                    IncomingRequests.map((req: any) => (
+                      <div
+                        key={req.id}
+                        className="flex items-center justify-between p-4 rounded-lg border bg-card"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium capitalize">
+                            {req.requester?.username || "Unknown Student"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-green-600 hover:bg-green-50"
+                            onClick={() => handleAcceptParentRequest(req.id)}
                           >
                             <Check className="h-4 w-4" />
                           </Button>
