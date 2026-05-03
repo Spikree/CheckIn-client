@@ -4,7 +4,7 @@ import axiosInstance from "../utils/axios";
 interface CommonStore {
   getTaskHistory: (taskId: string) => Promise<void>;
 
-  taskHistory: [];
+  taskHistory: string[];
 }
 
 export const CommonStore = create<CommonStore>((set) => ({
