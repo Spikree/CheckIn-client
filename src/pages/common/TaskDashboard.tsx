@@ -13,6 +13,12 @@ import { ActivityCalendar } from "react-activity-calendar";
 import { Flame } from "lucide-react";
 import Breadcrumb from "./PageBreadcrumbs";
 
+type ActivityData = {
+  date: string;
+  count: number;
+  level: 0 | 1 | 2 | 3 | 4;
+};
+
 export default function TaskDashboard() {
   const { taskId } = useParams<{ taskId: string }>();
   const { getTaskHistory, taskHistory } = CommonStore();
@@ -27,7 +33,7 @@ export default function TaskDashboard() {
   }, [getTaskHistory, taskId]);
 
   const activityData = useMemo(() => {
-    const data = [];
+    const data: ActivityData[] = [];
     const today = new Date();
 
     // Start 6 months (approx 182 days) in the past
